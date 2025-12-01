@@ -9,14 +9,51 @@ const pool = new Pool({
   database: process.env.POSTGRES_DB,
 });
 
-async function testConnection() {
+async function initTables() 
+{
+  const createOrdersTable = `
+    CREATE TABLE IF NOT EXISTS orders (
+      orderId VARCHAR(255) PRIMARY KEY,
+      value NUMERIC NOT NULL,
+      creationDate TIMESTAMP NOT NULL
+    );
+  `;
+
+  const createItemsTable = `
+    CREATE TABLE IF NOT EXISTS items (
+      id SERIAL PRIMARY KEY,
+      orderId VARCHAR(255) NOT NULL,
+      productId INTEGER NOT NULL,
+      quantity INTEGER NOT NULL,
+      price NUMERIC NOT NULL,
+      CONSTRAINT fk_order
+        FOREIGN KEY(orderId)
+        REFERENCES orders(orderId)
+        ON DELETE CASCADE
+    );
+  `;
+
+  try 
+  {
+    await pool.query(createOrdersTable);
+    await pool.query(createItemsTable);
+    console.log("[PostgreSQL] Tables checked/created.");
+  } catch (error) 
+  {
+    console.error("[PostgreSQL] Failed to create tables:", error.message);
+  }
+}
+
+async function testConnection() 
+{
   try 
   {
     await pool.query('SELECT 1');
-    console.log('[PostgreSQL] Connection established successfully.');
+    console.log("[PostgreSQL] Connection OK.");
+    await initTables();
   } catch (err) 
   {
-    console.error('[PostgreSQL] Connection error:', err.message);
+    console.error("[PostgreSQL] Connection error:", err.message);
   }
 }
 
