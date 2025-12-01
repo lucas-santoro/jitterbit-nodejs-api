@@ -1,0 +1,18 @@
+{
+  "name": "jitterbit-nodejs-api",
+  "version": "1.0.0",
+  "description": "API usando Node.js para o teste técnico da empresa JitterBit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
