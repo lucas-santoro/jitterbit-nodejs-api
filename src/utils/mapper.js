@@ -1,7 +1,6 @@
 function mapRequestToOrder(data) 
 {
-    return 
-    {
+    return {
       orderId: data.numeroPedido,
       value: data.valorTotal,
       creationDate: new Date(data.dataCriacao),
