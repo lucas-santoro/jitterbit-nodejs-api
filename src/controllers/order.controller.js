@@ -7,23 +7,35 @@ const
     deleteOrderService,
   } = require('../services/order.service');
   
-
   async function createOrderController(req, res) 
   {
     try {
       const data = req.body;
   
-      if (!data.numeroPedido || !data.items) 
-        {
-        return res.status(400).json({ error: 'Missing required fields.' });
+      if (!data.numeroPedido) 
+      {
+        return res.status(400).json({ error: 'numeroPedido is required.' });
+      }
+  
+      if (!Array.isArray(data.items) || data.items.length === 0) 
+      {
+        return res
+          .status(400)
+          .json({ error: 'items must be a non empty array.' });
       }
   
       const result = await createOrderService(data);
-      return res.status(201).json(result);
-    } catch (err) 
-    {
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to create order.' });
+  
+      return res.status(201).json({
+        message: 'Order created successfully.',
+        data: result,
+      });
+    } catch (err)
+     {
+      console.error('Error while creating order:', err);
+      return res.status(500).json({
+        error: 'An unexpected error occurred while creating the order.',
+      });
     }
   }
   
@@ -34,15 +46,20 @@ const
   
       const result = await getOrderService(orderId);
       if (!result) 
-        {
+      {
         return res.status(404).json({ error: 'Order not found.' });
       }
   
-      return res.json(result);
+      return res.status(200).json({
+        message: 'Order retrieved successfully.',
+        data: result,
+      });
     } catch (err) 
     {
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to fetch order.' });
+      console.error('Error while fetching order:', err);
+      return res.status(500).json({
+        error: 'An unexpected error occurred while fetching the order.',
+      });
     }
   }
   
@@ -50,53 +67,66 @@ const
   {
     try {
       const result = await listOrdersService();
-      return res.json(result);
+  
+      return res.status(200).json({
+        message: 'Orders retrieved successfully.',
+        total: result.length,
+        data: result,
+      });
     } catch (err) 
     {
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to list orders.' });
+      console.error('Error while listing orders:', err);
+      return res.status(500).json({
+        error: 'An unexpected error occurred while listing the orders.',
+      });
     }
   }
-  
-  // -----------------------------
-  // UPDATE
-  // -----------------------------
+
   async function updateOrderController(req, res) 
   {
     try {
       const { orderId } = req.params;
+      const updateData = req.body;
   
-      const result = await updateOrderService(orderId, req.body);
-      if (!result) 
-        {
+      const updated = await updateOrderService(orderId, updateData);
+      if (!updated) 
+      {
         return res.status(404).json({ error: 'Order not found.' });
       }
   
-      return res.json(result);
+      return res.status(200).json({
+        message: 'Order updated successfully.',
+        data: updated,
+      });
     } catch (err) 
     {
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to update order.' });
+      console.error('Error while updating order:', err);
+      return res.status(500).json({
+        error: 'An unexpected error occurred while updating the order.',
+      });
     }
   }
 
   async function deleteOrderController(req, res) 
   {
-    try 
-    {
+    try {
       const { orderId } = req.params;
   
-      const result = await deleteOrderService(orderId);
-      if (!result) 
-        {
+      const deleted = await deleteOrderService(orderId);
+      if (!deleted) 
+      {
         return res.status(404).json({ error: 'Order not found.' });
       }
   
-      return res.json({ message: 'Order deleted successfully.' });
+      return res.status(200).json({
+        message: `Order ${orderId} deleted successfully.`,
+      });
     } catch (err) 
     {
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to delete order.' });
+      console.error('Error while deleting order:', err);
+      return res.status(500).json({
+        error: 'An unexpected error occurred while deleting the order.',
+      });
     }
   }
   
