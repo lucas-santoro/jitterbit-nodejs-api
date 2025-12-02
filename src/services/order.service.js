@@ -11,16 +11,29 @@ const
   
   const { mapRequestToOrder } = require('../utils/mapper');
 
-  async function createOrderService(requestData) 
+  async function createOrderService(requestData)
   {
-    const mapped = mapRequestToOrder(requestData);
+    try 
+    {
+      const mapped = mapRequestToOrder(requestData);
   
-    const createdOrder = await createOrder(mapped);
-    const items = await createOrderItems(mapped.orderId, mapped.items);
+      const createdOrder = await createOrder(mapped);
+      const items = await createOrderItems(mapped.orderId, mapped.items);
   
-    return { ...createdOrder, items };
+      return { ...createdOrder, items };
+  
+    } catch (err) 
+    {
+  
+      if (err.code === '23505') 
+      {
+        const duplicateError = new Error("Order already exists.");
+        duplicateError.status = 409;
+        throw duplicateError;
+      }
+        throw err;
+    }
   }
-  
   async function getOrderService(orderId) 
   {
     const order = await getOrder(orderId);
@@ -42,12 +55,13 @@ const
     const updated = await updateOrder(orderId, mapped);
     if (!updated) return null;
   
-    // Simples para o teste: recria os itens
     await deleteOrder(orderId);
-    await createOrder(mapped);
-    const newItems = await createOrderItems(mapped.orderId, mapped.items);
+    const orderToCreate = { ...mapped, orderId: orderId };
+    
+    await createOrder(orderToCreate);
+    const newItems = await createOrderItems(orderId, mapped.items);
   
-    return { ...mapped, items: newItems };
+    return { ...orderToCreate, items: newItems };
   }
   
   async function deleteOrderService(orderId) 

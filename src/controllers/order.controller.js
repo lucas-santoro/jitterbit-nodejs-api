@@ -30,14 +30,15 @@ const
         message: 'Order created successfully.',
         data: result,
       });
-    } catch (err)
-     {
-      console.error('Error while creating order:', err);
-      return res.status(500).json({
-        error: 'An unexpected error occurred while creating the order.',
-      });
+    } catch (err) 
+    {
+        console.error('Error while creating order:', err);
+      
+        return res.status(err.status || 500).json({
+          error: err.message || 'An unexpected error occurred while creating the order.'
+        });
     }
-  }
+}
   
   async function getOrderController(req, res) 
   {
