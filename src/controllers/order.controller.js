@@ -34,6 +34,7 @@ const
     {
         console.error('Error while creating order:', err);
       
+        // Use custom status code if provided (e.g., 409 for duplicates), otherwise 500
         return res.status(err.status || 500).json({
           error: err.message || 'An unexpected error occurred while creating the order.'
         });

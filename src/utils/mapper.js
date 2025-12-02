@@ -1,3 +1,4 @@
+// Maps external API format (Portuguese field names) to internal database format
 function mapRequestToOrder(data) 
 {
     return {

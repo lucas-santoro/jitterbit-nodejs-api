@@ -24,7 +24,7 @@ const
   
     } catch (err) 
     {
-  
+      // PostgreSQL unique constraint violation (duplicate orderId)
       if (err.code === '23505') 
       {
         const duplicateError = new Error("Order already exists.");
@@ -55,6 +55,8 @@ const
     const updated = await updateOrder(orderId, mapped);
     if (!updated) return null;
   
+    // Delete and recreate order to update items (simplified approach)
+    // Ensure orderId from URL params is used, not from request body
     await deleteOrder(orderId);
     const orderToCreate = { ...mapped, orderId: orderId };
     

@@ -25,6 +25,7 @@ async function createOrderItems(orderId, items)
 
   const insertedItems = [];
 
+  // Insert each item individually and collect results
   for (const item of items) 
     {
     const res = await pool.query(query, [
